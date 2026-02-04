@@ -307,6 +307,19 @@ def create_target(monster_name: str, level: int) -> TargetType:
 # CORE TESTING FUNCTIONS
 # ============================================================================
 
+def _run_single_dpr_iteration(
+    character: "sim.character.Character",
+    level: int,
+    num_fights: int,
+    num_rounds: int,
+    monster_name: str,
+) -> float:
+    """Helper function to run a single DPR simulation iteration."""
+    target = create_target(monster_name, level)
+    simulation = Simulation(character, target, num_fights, num_rounds)
+    simulation.run()
+    return simulation.get_total_damage()
+
 def test_dpr(
     character: "sim.character.Character",
     level: int,
@@ -316,9 +329,9 @@ def test_dpr(
     monster_name: str,
 ) -> float:
     """
-    Calculate average Damage Per Round (DPR) for a character.
+    Calculate average Damage Per Round (DPR) for a character using multiprocessing.
     
-    Runs multiple iterations of combat simulation and averages
+    Runs multiple iterations of combat simulation in parallel and averages
     the damage dealt per round across all iterations.
     
     Args:
@@ -341,18 +354,16 @@ def test_dpr(
     if iterations < 1:
         raise ValueError(f"iterations must be positive, got {iterations}")
     
-    total_damage = 0.0
+    # Create arguments for each iteration
+    args_for_pool = [
+        (character, level, num_fights, num_rounds, monster_name)
+        for _ in range(iterations)
+    ]
     
-    for _ in range(iterations):
-        # Create fresh target for each iteration
-        target = create_target(monster_name, level)
-        
-        # Run simulation
-        simulation = Simulation(character, target, num_fights, num_rounds)
-        simulation.run()
-        
-        # Accumulate damage
-        total_damage += simulation.get_total_damage()
+    with multiprocessing.pool.Pool() as pool:
+        results = pool.starmap(_run_single_dpr_iteration, args_for_pool)
+    
+    total_damage = sum(results)
     
     # Calculate average DPR
     total_rounds = num_fights * num_rounds * iterations
@@ -395,7 +406,7 @@ def test_character(args: Args) -> List[List[Any]]:
     
     # Test each level in the range
     for level in range(args.start_level, args.end_level + 1):
-        # Clear previous logs
+        # Clear previous logs (for this level's DPR calculation)
         log.record_.clear()
         
         # Calculate DPR for this level
@@ -408,14 +419,11 @@ def test_character(args: Args) -> List[List[Any]]:
             monster_name=args.monster_name,
         )
         
-        # Store results with log data
-        data.append([level, config.name, dpr, log.record_.copy()])
+        # Store results
+        data.append([level, config.name, dpr])
     
-    # Print debug report if enabled
-    if args.debug:
-        log.printReport()
-    
-    return data
+    # Return character name and all collected log data for aggregation
+    return {"character_name": config.name, "data": data, "log_data": log.record_.copy()}
 
 
 def test_characters(
@@ -427,7 +435,7 @@ def test_characters(
     iterations: int = DEFAULT_ITERATIONS,
     debug: bool = False,
     monster_name: str = DEFAULT_MONSTER,
-) -> List[List[Any]]:
+) -> Tuple[List[List[Any]], Optional[defaultdict]]:
     """
     Test multiple characters in parallel across a level range.
     
@@ -445,10 +453,9 @@ def test_characters(
         monster_name: Target monster name (default: 'generic')
     
     Returns:
-        List of results in format:
-        [["Level", "Character", "DPR", "Log"],
-         [level, name, dpr, log_data],
-         ...]
+        A tuple containing:
+        - List of results in format: [["Level", "Character", "DPR"], [level, name, dpr], ...]
+        - Aggregated log data (defaultdict) if debug is True, otherwise None
         
     Raises:
         ValueError: If parameters are invalid
@@ -456,26 +463,24 @@ def test_characters(
     Performance:
         Uses multiprocessing.Pool for parallel execution.
         Each character is tested in a separate process.
-        
-    Example:
-        >>> results = test_characters(
-        ...     characters=["fighter", "barbarian"],
-        ...     start_level=1,
-        ...     end_level=20,
-        ...     num_rounds=5,
-        ...     num_fights=3,
-        ...     iterations=500,
-        ...     debug=False,
-        ...     monster_name="generic"
-        ... )
-        >>> # results[0] is header row
-        >>> # results[1:] are data rows
     """
     if not characters:
         raise ValueError("Must provide at least one character to test")
     
-    # Initialize with header row
-    data = [["Level", "Character", "DPR", "Log"]]
+    # Initialize with header row (without "Log" column)
+    dpr_results = [["Level", "Character", "DPR"]]
+    all_log_data = defaultdict(int)
+    
+    # Temporarily save current global log state and clear for this run
+    initial_log_enabled = log.enabled
+    initial_log_record = log.record_.copy()
+    
+    if debug:
+        log.enable()
+        log.record_.clear()
+    else:
+        log.enabled = False
+        log.record_.clear()
     
     # Create argument sets for each character
     args_list = [
@@ -494,13 +499,24 @@ def test_characters(
     
     # Run tests in parallel using multiprocessing
     with multiprocessing.pool.Pool() as pool:
+        # Each output will be a dictionary: {"character_name": ..., "data": [[level, name, dpr], ...], "log_data": {}}
         outputs = pool.map(test_character, args_list)
         
-        # Aggregate results
+        # Aggregate results and log data
         for output in outputs:
-            data.extend(output)
+            dpr_results.extend(output["data"])
+            if debug: # Only aggregate log data if debug is enabled
+                for key, value in output["log_data"].items():
+                    all_log_data[key] += value
     
-    return data
+    # Restore initial global log state
+    log.enabled = initial_log_enabled
+    log.record_ = initial_log_record
+    
+    if debug:
+        return dpr_results, all_log_data
+    else:
+        return dpr_results, None
 
 
 # ============================================================================
