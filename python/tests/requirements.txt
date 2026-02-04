@@ -1,0 +1,98 @@
+# ============================================================================
+# CORE TESTING DEPENDENCIES
+# ============================================================================
+
+# Pytest - Framework de testing
+pytest==7.4.3
+pytest-html==4.1.1              # Reportes HTML
+pytest-json-report==1.5.0       # Reportes JSON
+pytest-cov==4.1.0               # Coverage de código
+pytest-timeout==2.2.0           # Timeouts para tests
+pytest-xdist==3.5.0             # Ejecución paralela
+pytest-rerunfailures==13.0      # Re-ejecutar tests fallidos
+pytest-instafail==0.5.0         # Mostrar fallos inmediatamente
+pytest-sugar==0.9.7             # Output más bonito
+pytest-watch==4.2.0             # Auto-ejecutar tests en cambios
+
+# ============================================================================
+# SELENIUM & WEBDRIVER
+# ============================================================================
+
+# Selenium - Automatización de navegador
+selenium==4.16.0
+
+# WebDriver Manager - Gestión automática de drivers
+webdriver-manager==4.0.1
+
+# ============================================================================
+# HTTP & NETWORKING
+# ============================================================================
+
+# Requests - Cliente HTTP
+requests==2.31.0
+
+# ============================================================================
+# DATA & UTILITIES
+# ============================================================================
+
+# Logging mejorado (opcional pero recomendado)
+coloredlogs==15.0.1
+
+# ============================================================================
+# OPTIONAL BUT RECOMMENDED
+# ============================================================================
+
+# Faker - Generación de datos de prueba
+Faker==22.0.0
+
+# Pillow - Manipulación de imágenes (para screenshots)
+Pillow==10.1.0
+
+# ============================================================================
+# DEVELOPMENT TOOLS
+# ============================================================================
+
+# IPython - Shell interactivo mejorado (útil para debugging)
+ipython==8.18.1
+
+# pytest-picked - Ejecutar solo tests modificados (con git)
+pytest-picked==0.5.0
+
+# pytest-testmon - Ejecutar solo tests afectados por cambios
+pytest-testmon==2.1.0
+
+# ============================================================================
+# LINTING & CODE QUALITY (OPCIONAL)
+# ============================================================================
+
+# Black - Formateador de código
+# black==23.12.1
+
+# Flake8 - Linter
+# flake8==7.0.0
+
+# MyPy - Type checking
+# mypy==1.7.1
+
+# ============================================================================
+# CI/CD TOOLS (OPCIONAL)
+# ============================================================================
+
+# pytest-github-actions-annotate-failures - Anotaciones en GitHub Actions
+# pytest-github-actions-annotate-failures==0.2.0
+
+# ============================================================================
+# NOTES
+# ============================================================================
+
+# Para instalar:
+# pip install -r requirements.txt
+
+# Para instalar con opcionales de desarrollo:
+# pip install -r requirements.txt -r requirements-dev.txt
+
+# Para actualizar todas las dependencias:
+# pip install --upgrade -r requirements.txt
+
+# Para generar un requirements.txt desde tu entorno actual:
+# pip freeze > requirements.txt
