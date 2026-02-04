@@ -3,6 +3,7 @@ import { Character } from "../src/sim/Character";
 import { Target } from "../src/sim/Target";
 import { Simulation } from "../src/sim/Simulation";
 import { Greatsword } from "../src/weapons/martial/melee/Greatsword";
+import { DefaultAttackActionOperation } from "../src/sim/actions/AttackAction";
 
 // IMPORTANT: Temporary Fix for TypeScript Errors
 // The following changes were made to resolve TypeScript errors (TS2353)
@@ -33,14 +34,13 @@ const misStats = {
 // 3. Creamos el Personaje
 // Eliminamos la propiedad 'name' que causaba el error
 const miPersonaje = new Character({
-    // FIX: Removed 'level' property to resolve TS2353.
-    // The type definition for Character's constructor config
-    // appears not to include 'level' at this top level.
     stats: misStats,
-    items: [
-        new Greatsword()
-    ]
 });
+miPersonaje.level = 5;
+
+// Equip the Greatsword and set it as the default attack action
+const miArma = new Greatsword();
+miPersonaje.customTurn.addOperation("action", new DefaultAttackActionOperation(miArma));
 
 // 4. Configurar el Objetivo (Target)
 // Un enemigo con stats apropiados para un CR 15 (ajusta según tu sistema)
@@ -53,10 +53,7 @@ const statsObjetivo = {
     cha: 10 
 };
 const miObjetivo = new Target({ 
-    // FIX: Removed 'stats' property to resolve TS2353.
-    // The type definition for Target's constructor config
-    // appears not to include 'stats' at this top level,
-    // contrary to what one might expect for a Target.
+    level: 15
 }); 
 
 
