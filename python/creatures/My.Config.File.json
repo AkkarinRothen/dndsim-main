@@ -1,0 +1,38 @@
+{
+  "sources" : {
+    "adventure" : [
+      "LMoP"
+    ],
+    "book" : [
+      "xPHB",
+      "xDMG",
+      "xMM",
+      ""
+    ],
+    "reference" : [
+      "MM"
+    ],
+    "homebrew" : [
+      "homebrew/homebrew/package.json"
+    ]
+  },
+  "paths" : {
+    "rules" : "3-Mechanics/CLI/rules/",
+    "compendium" : "3-Mechanics/CLI/"
+  },
+  "images" : {
+    "copyInternal" : false,
+    "copyExternal" : true,
+    "internalRoot" : "5etools-img"
+  },
+  "reprintBehavior" : "newest",
+  "useDiceRoller" : true,
+  "tagPrefix" : "ttrpg-cli",
+  "template" : {
+    "background" : "examples/templates/tools5e/images-background2md.txt",
+    "monster" : "examples/templates/tools5e/monster2md-yamlStatblock-body.txt",
+    "item" : "examples/templates/tools5e/images-item2md.txt",
+    "race" : "examples/templates/tools5e/images-race2md.txt",
+    "spell" : "examples/templates/tools5e/images-spell2md.txt"
+  }
+}

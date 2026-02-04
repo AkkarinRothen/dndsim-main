@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulation Results</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body { font-family: sans-serif; margin: 2em; background-color: #f4f4f4; }
+        .container { max-width: 90%; margin: auto; background: white; padding: 2em; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #333; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2em;
+            margin-bottom: 2em;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+        }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        #chart { width: 100%; }
+        a {
+            display: inline-block;
+            margin-top: 2em;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        a:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Simulation Results</h1>
+
+        <div id="chart"></div>
+
+        <h2>Raw Data</h2>
+        <table>
+            <thead>
+                <tr>
+                    {% for header in data[0] %}
+                        <th>{{ header }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data[1:] %}
+                <tr>
+                    {% for cell in row %}
+                        <td>{{ cell }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <a href="/">Run a New Simulation</a>
+    </div>
+
+    <script>
+        var chart_data = {{ chart_json | safe }};
+        Plotly.newPlot('chart', chart_data.data, chart_data.layout);
+    </script>
+</body>
+</html>

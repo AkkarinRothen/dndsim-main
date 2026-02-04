@@ -1,0 +1,225 @@
+{
+  "Li Wei": {
+    "name": "Li Wei",
+    "turns": 5,
+    "combat_stats": {
+      "damage_dealt": 100,
+      "damage_taken": 0,
+      "hits": 10,
+      "misses": 4,
+      "crits": 1,
+      "hit_rate": "71.4%"
+    },
+    "spell_slots": {},
+    "resources": {
+      "Ki": {
+        "used": 4,
+        "max": 10,
+        "remaining": 6,
+        "percentage": "40.0%",
+        "details": [
+          "Flurry of Blows",
+          "Flurry of Blows"
+        ]
+      }
+    },
+    "actions": {
+      "attacks": [
+        "Bastón",
+        "Bastón (Extra Attack)",
+        "Bastón",
+        "Bastón (Extra Attack)",
+        "Puño desarmado 1",
+        "Puño desarmado 2",
+        "Bastón",
+        "Bastón (Extra Attack)",
+        "Bastón",
+        "Bastón (Extra Attack)",
+        "Puño desarmado 1",
+        "Puño desarmado 2",
+        "Bastón",
+        "Bastón (Extra Attack)"
+      ],
+      "bonus_actions": [
+        "Flurry of Blows",
+        "Flurry of Blows"
+      ],
+      "reactions": [],
+      "abilities": []
+    }
+  },
+  "Morgana": {
+    "name": "Morgana",
+    "turns": 5,
+    "combat_stats": {
+      "damage_dealt": 108,
+      "damage_taken": 0,
+      "hits": 4,
+      "misses": 1,
+      "crits": 0,
+      "hit_rate": "80.0%"
+    },
+    "spell_slots": {
+      "Level 1": {
+        "used": 3,
+        "max": 4,
+        "remaining": 1,
+        "spells": [
+          "Magic Missile",
+          "Magic Missile",
+          "Magic Missile"
+        ]
+      },
+      "Level 2": {
+        "used": 1,
+        "max": 3,
+        "remaining": 2,
+        "spells": [
+          "Scorching Ray"
+        ]
+      },
+      "Level 3": {
+        "used": 1,
+        "max": 3,
+        "remaining": 2,
+        "spells": [
+          "Fireball"
+        ]
+      }
+    },
+    "resources": {
+      "Sorcery": {
+        "used": 4,
+        "max": 10,
+        "remaining": 6,
+        "percentage": "40.0%",
+        "details": [
+          "Quickened Spell",
+          "Quickened Spell"
+        ]
+      }
+    },
+    "actions": {
+      "attacks": [
+        "Firebolt (Quickened)",
+        "Scorching Ray #1",
+        "Scorching Ray #2",
+        "Scorching Ray #3",
+        "Firebolt (Quickened)"
+      ],
+      "bonus_actions": [
+        "Quickened Spell - Firebolt",
+        "Quickened Spell - Firebolt"
+      ],
+      "reactions": [],
+      "abilities": []
+    }
+  },
+  "Padre Aldric": {
+    "name": "Padre Aldric",
+    "turns": 5,
+    "combat_stats": {
+      "damage_dealt": 43,
+      "damage_taken": 0,
+      "hits": 6,
+      "misses": 2,
+      "crits": 0,
+      "hit_rate": "75.0%"
+    },
+    "spell_slots": {
+      "Level 2": {
+        "used": 2,
+        "max": 3,
+        "remaining": 1,
+        "spells": [
+          "Spiritual Weapon",
+          "Cure Wounds"
+        ]
+      }
+    },
+    "resources": {
+      "Channel Divinity": {
+        "used": 1,
+        "max": 3,
+        "remaining": 2,
+        "percentage": "33.3%",
+        "details": [
+          "Turn Undead"
+        ]
+      }
+    },
+    "actions": {
+      "attacks": [
+        "Maza",
+        "Spiritual Weapon",
+        "Maza",
+        "Spiritual Weapon",
+        "Maza",
+        "Spiritual Weapon",
+        "Maza",
+        "Spiritual Weapon"
+      ],
+      "bonus_actions": [
+        "Spiritual Weapon (conjurar)",
+        "Spiritual Weapon (ataque)",
+        "Spiritual Weapon (ataque)",
+        "Spiritual Weapon (ataque)",
+        "Spiritual Weapon (ataque)"
+      ],
+      "reactions": [],
+      "abilities": [
+        "Turn Undead"
+      ]
+    }
+  },
+  "Thorin": {
+    "name": "Thorin",
+    "turns": 5,
+    "combat_stats": {
+      "damage_dealt": 220,
+      "damage_taken": 0,
+      "hits": 17,
+      "misses": 7,
+      "crits": 0,
+      "hit_rate": "70.8%"
+    },
+    "spell_slots": {},
+    "resources": {},
+    "actions": {
+      "attacks": [
+        "Espada larga #1",
+        "Espada larga #2",
+        "Espada larga #3",
+        "Espada larga #4",
+        "Espada larga #1",
+        "Espada larga #2",
+        "Espada larga #3",
+        "Espada larga #4",
+        "Espada larga (AS) #1",
+        "Espada larga (AS) #2",
+        "Espada larga (AS) #3",
+        "Espada larga (AS) #4",
+        "Espada larga #1",
+        "Espada larga #2",
+        "Espada larga #3",
+        "Espada larga #4",
+        "Espada larga #1",
+        "Espada larga #2",
+        "Espada larga #3",
+        "Espada larga #4",
+        "Espada larga #1",
+        "Espada larga #2",
+        "Espada larga #3",
+        "Espada larga #4"
+      ],
+      "bonus_actions": [
+        "Second Wind"
+      ],
+      "reactions": [],
+      "abilities": [
+        "Action Surge",
+        "Second Wind (15 HP)"
+      ]
+    }
+  }
+}

@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="D&D 5e Interactive Combat Simulator - Run tactical combat simulations">
+    <title>D&D 5e Combat Simulator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #5e4a7e;
+            --danger-color: #dc3545;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+            --light-bg: #f8f9fa;
+            --dark-text: #212529;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #4a3a5e 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .content-wrapper {
+            padding: 2rem;
+        }
+
+        .section-header {
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        /* Setup Form Styles */
+        .form-section {
+            background: var(--light-bg);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--dark-text);
+            margin-bottom: 0.5rem;
+        }
+
+        .enemy-row {
+            transition: all 0.3s ease;
+        }
+
+        .enemy-row:hover {
+            background: rgba(94, 74, 126, 0.05);
+            border-radius: 0.25rem;
+        }
+
+        /* Combat Display Styles */
+        .combatant-card {
+            border: 2px solid #dee2e6;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .combatant-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .combatant-card.party {
+            border-left: 4px solid var(--info-color);
+        }
+
+        .combatant-card.enemy {
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .combatant-card.down {
+            opacity: 0.5;
+            background: #f0f0f0;
+        }
+
+        .combatant-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--dark-text);
+        }
+
+        .hp-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .hp-bar-container {
+            background: #e9ecef;
+            border-radius: 1rem;
+            height: 1.5rem;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .hp-bar {
+            height: 100%;
+            transition: width 0.5s ease-in-out, background-color 0.3s ease;
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .hp-bar.healthy { background: linear-gradient(90deg, var(--success-color), #20c997); }
+        .hp-bar.injured { background: linear-gradient(90deg, var(--warning-color), #fd7e14); }
+        .hp-bar.critical { background: linear-gradient(90deg, var(--danger-color), #c82333); }
+
+        /* Combat Log Styles */
+        #combat-log {
+            background: #2d3748;
+            color: #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            max-height: 500px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        #combat-log::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #combat-log::-webkit-scrollbar-track {
+            background: #1a202c;
+            border-radius: 4px;
+        }
+
+        #combat-log::-webkit-scrollbar-thumb {
+            background: #4a5568;
+            border-radius: 4px;
+        }
+
+        #combat-log p {
+            margin: 0.5rem 0;
+            line-height: 1.6;
+        }
+
+        #combat-log .log-round {
+            color: #fbbf24;
+            font-weight: 700;
+            border-top: 1px solid #4a5568;
+            padding-top: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Button Styles */
+        .btn-custom {
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            border: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--primary-color), #4a3a5e);
+            color: white;
+        }
+
+        .btn-success-custom {
+            background: linear-gradient(135deg, var(--success-color), #20c997);
+            color: white;
+        }
+
+        .btn-danger-custom {
+            background: linear-gradient(135deg, var(--danger-color), #c82333);
+            color: white;
+        }
+
+        /* Round Counter */
+        .round-counter {
+            background: linear-gradient(135deg, var(--primary-color), #4a3a5e);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Victory/Defeat Message */
+        .combat-result {
+            padding: 2rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 1rem 0;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .combat-result.victory {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .combat-result.defeat {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            border-width: 0.3rem;
+        }
+
+        /* Utility Classes */
+        .d-none {
+            display: none !important;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-container {
+                margin: 1rem;
+                border-radius: 0.5rem;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .content-wrapper {
+                padding: 1rem;
+            }
+
+            .btn-custom {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="header">
+            <h1>⚔️ D&D 5e Combat Simulator 🎲</h1>
+            <p class="mb-0">Tactical Turn-Based Combat System</p>
+        </div>
+
+        <div class="content-wrapper">
+            <!-- Setup Area -->
+            <div id="setup-area">
+                <h2 class="section-header">⚙️ Combat Configuration</h2>
+
+                <!-- Preset Selection -->
+                <div class="form-section">
+                    <label for="preset-select" class="form-label">📋 Load Preset Scenario</label>
+                    <select id="preset-select" class="form-select">
+                        <option value="">-- Create Custom Combat --</option>
+                        {% for key, preset in presets.items() %}
+                            <option value="{{ key }}">{{ preset.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <small class="text-muted">Choose a pre-configured combat scenario or create your own</small>
+                </div>
+
+                <!-- Combat Setup Form -->
+                <form id="combat-setup-form">
+                    <div class="form-section">
+                        <label for="level-select" class="form-label">🎖️ Party Level</label>
+                        <input type="number" id="level-select" class="form-control" 
+                               value="1" min="1" max="20" required
+                               aria-label="Party level">
+                        <small class="text-muted">Level 1-20</small>
+                    </div>
+
+                    <div class="form-section">
+                        <label for="party-select" class="form-label">👥 Party Members</label>
+                        <select id="party-select" class="form-select" multiple size="6" 
+                                required aria-label="Select party members">
+                            {% for char in characters %}
+                                <option value="{{ char }}">{{ char|title }}</option>
+                            {% endfor %}
+                        </select>
+                        <small class="text-muted">Hold Ctrl/Cmd to select multiple characters</small>
+                    </div>
+
+                    <div class="form-section">
+                        <label class="form-label">👹 Enemies</label>
+                        <div id="enemy-list" role="list">
+                            <!-- Enemy rows will be added here by JavaScript -->
+                        </div>
+                        <button type="button" id="add-enemy" class="btn btn-secondary btn-sm mt-2">
+                            + Add Enemy Type
+                        </button>
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-custom btn-primary-custom">
+                            ⚔️ Start Combat
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Combat Area -->
+            <div id="combat-area" class="d-none">
+                <div class="round-counter" id="round-counter">
+                    Round <span id="round-number">0</span>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3 class="section-header">👥 Party</h3>
+                        <div id="party-display"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <h3 class="section-header">👹 Enemies</h3>
+                        <div id="enemy-display"></div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <button id="next-turn-btn" class="btn btn-custom btn-success-custom">
+                        ▶️ Next Turn
+                    </button>
+                    <button id="reset-btn" class="btn btn-custom btn-danger-custom">
+                        🔄 New Combat
+                    </button>
+                </div>
+
+                <div id="combat-log" role="log" aria-live="polite" aria-atomic="false">
+                    <p class="log-round">⚔️ Combat is starting...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        'use strict';
+        
+        // Application State
+        const AppState = {
+            monsters: {{ monsters|tojson|safe }},
+            presets: {{ presets|tojson|safe }},
+            combatInProgress: false
+        };
+
+        // DOM Elements
+        let elements = {};
+
+        // Utility Functions
+        const Utils = {
+            logError: function(message, error) {
+                console.error(message, error);
+                const log = elements.combatLog || document.getElementById('combat-log');
+                if (log) {
+                    const p = document.createElement('p');
+                    p.className = 'text-danger fw-bold';
+                    p.textContent = `❌ ${message}: ${error.message}`;
+                    log.appendChild(p);
+                    log.scrollTop = log.scrollHeight;
+                } else {
+                    alert(`❌ Error: ${message}`);
+                }
+            },
+            clearChildren: function(element) {
+                while (element.firstChild) {
+                    element.removeChild(element.firstChild);
+                }
+            },
+            escapeHtml: function(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            },
+            getHPPercentage: function(current, max) {
+                return Math.max(0, Math.min(100, (current / max) * 100));
+            },
+            getHPClass: function(percentage) {
+                if (percentage > 50) return 'healthy';
+                if (percentage > 25) return 'injured';
+                return 'critical';
+            }
+        };
+
+        // Enemy Row Management
+        function createEnemyRow() {
+            const row = document.createElement('div');
+            row.classList.add('input-group', 'mb-2', 'enemy-row');
+            row.setAttribute('role', 'listitem');
+            const monsterSelect = document.createElement('select');
+            monsterSelect.classList.add('form-select', 'enemy-name');
+            monsterSelect.setAttribute('aria-label', 'Monster type');
+            AppState.monsters.forEach(function(monster) {
+                const option = document.createElement('option');
+                option.value = monster;
+                option.textContent = monster.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+                monsterSelect.appendChild(option);
+            });
+            const countInput = document.createElement('input');
+            countInput.type = 'number';
+            countInput.classList.add('form-control', 'enemy-count');
+            countInput.value = 1;
+            countInput.min = 1;
+            countInput.max = 20;
+            countInput.setAttribute('aria-label', 'Monster count');
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.classList.add('btn', 'btn-outline-danger');
+            removeBtn.textContent = '✕';
+            removeBtn.setAttribute('aria-label', 'Remove enemy');
+            removeBtn.onclick = function() { row.remove(); };
+            row.appendChild(monsterSelect);
+            row.appendChild(countInput);
+            row.appendChild(removeBtn);
+            elements.enemyList.appendChild(row);
+        }
+
+        // Combat UI Update
+        function updateCombatUI(data) {
+            if (data.error) {
+                Utils.logError('Received error from server', new Error(data.error));
+                return;
+            }
+            elements.roundNumber.textContent = data.round;
+            Utils.clearChildren(elements.partyDisplay);
+            Utils.clearChildren(elements.enemyDisplay);
+            data.combatants.forEach(function(combatant) {
+                const card = createCombatantCard(combatant);
+                const targetDisplay = combatant.team === 'party' ? elements.partyDisplay : elements.enemyDisplay;
+                targetDisplay.appendChild(card);
+            });
+            const currentLogLength = elements.combatLog.children.length;
+            data.log.slice(currentLogLength).forEach(function(message) {
+                const p = document.createElement('p');
+                p.textContent = message;
+                elements.combatLog.appendChild(p);
+            });
+            elements.combatLog.scrollTop = elements.combatLog.scrollHeight;
+            if (data.is_over) {
+                elements.nextTurnBtn.disabled = true;
+                showCombatResult(data.winner);
+            }
+        }
+
+        function createCombatantCard(combatant) {
+            const card = document.createElement('div');
+            card.classList.add('combatant-card', combatant.team);
+            if (combatant.is_down) card.classList.add('down');
+            const hpPercentage = Utils.getHPPercentage(combatant.hp, combatant.max_hp);
+            const hpClass = Utils.getHPClass(hpPercentage);
+            card.innerHTML = `
+                <div class="combatant-name">${Utils.escapeHtml(combatant.name)}</div>
+                <div class="hp-info">
+                    <span>HP:</span>
+                    <span>${combatant.hp} / ${combatant.max_hp}</span>
+                </div>
+                <div class="hp-bar-container">
+                    <div class="hp-bar ${hpClass}" style="width: ${hpPercentage}%">${Math.round(hpPercentage)}%</div>
+                </div>
+                ${combatant.is_down ? '<div class="text-danger mt-2 fw-bold">💀 DOWN</div>' : ''}
+            `;
+            return card;
+        }
+
+        function showCombatResult(winner) {
+            const resultDiv = document.createElement('div');
+            resultDiv.classList.add('combat-result', winner === 'party' ? 'victory' : 'defeat');
+            resultDiv.textContent = winner === 'party' ? '🎉 Victory! The party prevails!' : '💀 Defeat! The monsters are victorious!';
+            elements.combatLog.appendChild(resultDiv);
+        }
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            elements = {
+                addEnemyBtn: document.getElementById('add-enemy'),
+                enemyList: document.getElementById('enemy-list'),
+                presetSelect: document.getElementById('preset-select'),
+                combatSetupForm: document.getElementById('combat-setup-form'),
+                setupArea: document.getElementById('setup-area'),
+                combatArea: document.getElementById('combat-area'),
+                nextTurnBtn: document.getElementById('next-turn-btn'),
+                resetBtn: document.getElementById('reset-btn'),
+                partyDisplay: document.getElementById('party-display'),
+                enemyDisplay: document.getElementById('enemy-display'),
+                combatLog: document.getElementById('combat-log'),
+                roundNumber: document.getElementById('round-number')
+            };
+
+            elements.presetSelect.addEventListener('change', function() {
+                const presetKey = elements.presetSelect.value;
+                if (!presetKey) return;
+                const preset = AppState.presets[presetKey];
+                if (!preset) return;
+                document.getElementById('level-select').value = preset.level;
+                const partySelect = document.getElementById('party-select');
+                Array.from(partySelect.options).forEach(opt => opt.selected = preset.party.includes(opt.value));
+                Utils.clearChildren(elements.enemyList);
+                preset.enemies.forEach(enemy => {
+                    createEnemyRow();
+                    const lastRow = elements.enemyList.lastChild;
+                    lastRow.querySelector('.enemy-name').value = enemy[0];
+                    lastRow.querySelector('.enemy-count').value = enemy[1];
+                });
+            });
+
+            elements.combatSetupForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const party = Array.from(document.getElementById('party-select').selectedOptions).map(opt => opt.value);
+                const enemies = Array.from(document.querySelectorAll('#enemy-list .enemy-row')).map(row => ({ name: row.querySelector('.enemy-name').value, count: parseInt(row.querySelector('.enemy-count').value, 10) }));
+                const level = parseInt(document.getElementById('level-select').value, 10);
+                if (party.length === 0) return Utils.logError('Validation Error', new Error('Please select at least one party member'));
+                if (enemies.length === 0 || enemies.some(en => en.count < 1)) return Utils.logError('Validation Error', new Error('Please add at least one enemy'));
+                
+                fetch('/api/start_combat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ party, enemies, level })
+                })
+                .then(response => response.json().then(data => ({ ok: response.ok, data })))
+                .then(({ ok, data }) => {
+                    if (!ok) throw new Error(data.error || 'Failed to start combat');
+                    elements.setupArea.classList.add('d-none');
+                    elements.combatArea.classList.remove('d-none');
+                    elements.nextTurnBtn.disabled = false;
+                    Utils.clearChildren(elements.combatLog);
+                    AppState.combatInProgress = true;
+                    updateCombatUI(data);
+                })
+                .catch(error => Utils.logError('Error starting combat', error));
+            });
+
+            elements.nextTurnBtn.addEventListener('click', function() {
+                elements.nextTurnBtn.disabled = true;
+                fetch('/api/next_turn', { method: 'POST' })
+                    .then(response => response.json().then(data => ({ ok: response.ok, data })))
+                    .then(({ ok, data }) => {
+                        if (!ok) throw new Error(data.error || 'Failed to execute turn');
+                        updateCombatUI(data);
+                        if (!data.is_over) elements.nextTurnBtn.disabled = false;
+                    })
+                    .catch(error => {
+                        Utils.logError('Error during next turn', error);
+                        // Don't re-enable button on error
+                    });
+            });
+
+            elements.resetBtn.addEventListener('click', function() {
+                if (AppState.combatInProgress && !confirm('Are you sure you want to end this combat?')) return;
+                fetch('/api/reset_combat', { method: 'POST' })
+                    .then(() => {
+                        elements.combatArea.classList.add('d-none');
+                        elements.setupArea.classList.remove('d-none');
+                        elements.presetSelect.value = '';
+                        AppState.combatInProgress = false;
+                    })
+                    .catch(error => Utils.logError('Failed to reset combat', error));
+            });
+
+            elements.addEnemyBtn.addEventListener('click', createEnemyRow);
+            createEnemyRow();
+        });
+    </script>
+</body>
+</html>
+
+

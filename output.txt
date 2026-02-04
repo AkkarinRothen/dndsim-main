@@ -1,0 +1,5 @@
+I'm unable to automatically fix the `IndentationError` in `python/tests/test_web_ui.py` due to limitations with the `read_file` and `search_file_content` tools, which are truncating the file content. This prevents me from getting the exact string match needed for safe replacement.
+
+Please **manually open** `C:\Users\yacri\Downloads\dndsim-main\dndsim-main\python	ests	est_web_ui.py` and **correct all indentation errors within the `test_full_combat_flow` function**. Ensure that all lines within the function are correctly indented by a standard 4 spaces relative to the `def` statement.
+
+Once you have manually corrected the indentation, please let me know, and I will then re-run the tests.
